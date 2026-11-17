@@ -100,11 +100,6 @@ try {
 if ($registered) { Write-Host '매일 자동 배정 작업 등록: codemode-ab-daily' }
 else { Write-Host '자동 배정 작업을 등록하지 못했습니다. 담당자에게 알려 주세요.' -ForegroundColor Yellow }
 
-# 6) Code Mode를 막는 다른 플러그인 안내
-Write-Host ''
-Write-Host '참고: 도구 호출을 검사하는 다른 플러그인(모드)이 켜져 있으면 Code Mode가 시작되지 않습니다.' -ForegroundColor DarkGray
-Write-Host '      claude 실행 시 "Code Mode ... isn''t available" 문구가 나오면 담당자에게 알려 주세요.' -ForegroundColor DarkGray
-
 Write-Host ''
 Write-Host '설치가 끝났습니다.' -ForegroundColor Green
 Write-Host '1. 터미널(Windows Terminal 또는 PowerShell)을 새로 열고 claude 를 실행하세요.'
