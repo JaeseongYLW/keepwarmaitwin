@@ -1,0 +1,6 @@
+{
+  "env": {
+    "CLAUDE_CODE_PLUGIN_DIRS": "~/.claude/mods/keepwarm",
+    "CLAUDE_CODE_EXPERIMENTAL_CODE_MODE": "1"
+  }
+}

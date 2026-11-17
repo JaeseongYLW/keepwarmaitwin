@@ -1,0 +1,8 @@
+{
+  "name": "ai-twin-tools",
+  "owner": { "name": "JaeseongYLW" },
+  "plugins": [
+    { "name": "keepwarm", "source": "./mods/keepwarm", "description": "프롬프트 캐시 유지 ping, 캐시 만료 비용 경고, 5시간 사용 창 예약 시작" },
+    { "name": "codemode-ab", "source": "./mods/codemode-ab", "description": "Code Mode 켬/끔 실사용 비교 실험 (하루 단위 배정, 자동 전송)" }
+  ]
+}
