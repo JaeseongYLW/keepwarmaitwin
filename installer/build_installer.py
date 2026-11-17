@@ -29,6 +29,7 @@ def plugin_zip():
                     continue
                 p = os.path.join(base, f)
                 z.write(p, os.path.relpath(p, MOD).replace(os.sep, '/'))
+    # scripts/ 는 CRLF 그대로 담긴다 (Windows에서 실행)
     return base64.b64encode(buf.getvalue()).decode()
 
 

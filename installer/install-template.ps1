@@ -72,8 +72,42 @@ $json = $settings | ConvertTo-Json -Depth 32
 [IO.File]::WriteAllText($settingsPath, $json, (New-Object Text.UTF8Encoding $false))
 Write-Host "설정 반영: $settingsPath (기존 파일은 .bak 으로 백업)"
 
+# 5) 오늘 모드 정하기 + 매일 자동 배정 작업 등록 (매일 06:00, 로그인할 때)
+$daily = Join-Path $modDir 'scripts\daily-mode.ps1'
+& powershell -NoProfile -ExecutionPolicy Bypass -File $daily
+$assign = [IO.File]::ReadAllText((Join-Path $claudeDir 'codemode-ab\assignment.json')) | ConvertFrom-Json
+$label = '끔'
+if ($assign.mode -eq 'on') { $label = '켬' }
+Write-Host "오늘 배정: Code Mode $label"
+
+$taskArgs = "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$daily`""
+$registered = $false
+try {
+  $action = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument $taskArgs
+  $set = New-ScheduledTaskSettingsSet -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
+  $triggers = @(New-ScheduledTaskTrigger -Daily -At '06:00')
+  try { $triggers += New-ScheduledTaskTrigger -AtLogOn -User "$env:USERDOMAIN\$env:USERNAME" } catch { }
+  try {
+    Register-ScheduledTask -TaskName 'codemode-ab-daily' -Action $action -Trigger $triggers -Settings $set -Force -ErrorAction Stop | Out-Null
+  } catch {
+    Register-ScheduledTask -TaskName 'codemode-ab-daily' -Action $action -Trigger $triggers[0] -Settings $set -Force -ErrorAction Stop | Out-Null
+  }
+  $registered = $true
+} catch {
+  & schtasks /Create /F /SC DAILY /ST 06:00 /TN codemode-ab-daily /TR "powershell.exe $taskArgs" | Out-Null
+  if ($LASTEXITCODE -eq 0) { $registered = $true }
+}
+if ($registered) { Write-Host '매일 자동 배정 작업 등록: codemode-ab-daily' }
+else { Write-Host '자동 배정 작업을 등록하지 못했습니다. 담당자에게 알려 주세요.' -ForegroundColor Yellow }
+
+# 6) Code Mode를 막는 다른 플러그인 안내
+Write-Host ''
+Write-Host '참고: 도구 호출을 검사하는 다른 플러그인(모드)이 켜져 있으면 Code Mode가 시작되지 않습니다.' -ForegroundColor DarkGray
+Write-Host '      claude 실행 시 "Code Mode ... isn''t available" 문구가 나오면 담당자에게 알려 주세요.' -ForegroundColor DarkGray
+
 Write-Host ''
 Write-Host '설치가 끝났습니다.' -ForegroundColor Green
 Write-Host '1. 터미널(Windows Terminal 또는 PowerShell)을 새로 열고 claude 를 실행하세요.'
 Write-Host '2. 노란 안내가 보이면 /exit 후 claude 를 한 번 더 실행하세요. (오늘 배정된 모드로 바뀝니다)'
-Write-Host '3. /ab-status 로 오늘 배정과 집계를 볼 수 있습니다. 결과는 매일 자동 전송됩니다.'
+Write-Host '3. /ab-status 로 오늘 배정과 집계를 볼 수 있습니다. 결과는 매일 16:55에 자동 전송됩니다.'
+Write-Host "제거: $modDir\scripts\uninstall.cmd 실행"

@@ -8,19 +8,17 @@ export type DayStats = {
   outputTokens: number
   cacheReadTokens: number
   cacheWriteTokens: number
-  /** 모델이 직접 요청한 도구 호출 수 */
+  /** 모델이 요청한 도구 호출 수 */
   modelToolUses: number
   /** 모델이 직접 요청한 K-System(MCP) 호출 수 */
   knextModelCalls: number
   /** Code Mode 코드 실행(REPL) 횟수 */
   codeRuns: number
-  /** 실제로 실행된 도구 호출 수 (Code Mode 코드 안의 호출 포함 여부 확인용) */
-  executedToolCalls: number
-  /** 실제로 실행된 K-System 호출 수 */
-  knextExecuted: number
+  /** Code Mode 코드 안에 K-System 도구가 나온 횟수 */
+  knextInCode: number
   /** 질문부터 그 턴이 끝날 때까지 시간의 합(ms) */
   activeMs: number
-  /** 배정과 다른 모드로 실행된 세션 수 */
+  /** 그날 배정과 다른 모드로 실행된 세션 수 */
   mismatchSessions: number
 }
 

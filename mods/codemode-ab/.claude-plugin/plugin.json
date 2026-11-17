@@ -1,13 +1,33 @@
 {
   "name": "codemode-ab",
-  "version": "0.1.0",
-  "description": "Code Mode 켬/끔을 하루 단위로 무작위 배정하고, 실사용 지표(토큰, 왕복, K-System 호출, 시간)를 매일 웹훅으로 보내는 실험용 모드",
+  "version": "0.2.0",
+  "description": "Code Mode 켬/끔 실사용 비교 실험: 사용 지표(토큰, 왕복, K-System 호출, 시간)를 모아 매일 정해진 시각에 웹훅으로 보내는 모드",
   "license": "MIT",
   "types": "./types/index.d.ts",
   "userConfig": {
-    "participant": { "type": "string", "title": "참가자 이름", "description": "결과에 표시할 이름 또는 닉네임", "default": "" },
-    "webhookUrl": { "type": "string", "title": "결과 전송 웹훅 URL", "description": "Teams 워크플로 웹훅 URL. 비우면 전송하지 않습니다.", "default": "" },
-    "manageSettings": { "type": "boolean", "title": "Code Mode 설정 자동 전환", "description": "그날 배정된 모드를 ~/.claude/settings.json의 env에 씁니다.", "default": true },
-    "utcOffsetHours": { "type": "number", "title": "시간대(UTC 기준 시차)", "description": "한국은 9", "default": 9 }
+    "participant": {
+      "type": "string",
+      "title": "참가자 이름",
+      "description": "결과에 표시할 이름 또는 닉네임",
+      "default": ""
+    },
+    "webhookUrl": {
+      "type": "string",
+      "title": "결과 전송 웹훅 URL",
+      "description": "Teams 워크플로 웹훅 URL. 비우면 전송하지 않습니다.",
+      "default": ""
+    },
+    "utcOffsetHours": {
+      "type": "number",
+      "title": "시간대(UTC 기준 시차)",
+      "description": "한국은 9",
+      "default": 9
+    },
+    "reportTime": {
+      "type": "string",
+      "title": "매일 보고 시각",
+      "description": "HH:MM (현지 시각). 이 시각에 Claude Code가 켜져 있으면 오늘 결과를 보냅니다.",
+      "default": "16:55"
+    }
   }
 }
