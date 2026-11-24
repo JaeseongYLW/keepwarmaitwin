@@ -1,0 +1,86 @@
+#!/bin/bash
+# keepwarm 설치/업데이트 (macOS). Finder에서 더블클릭하거나 터미널에서 bash 로 실행합니다.
+set -euo pipefail
+NAME=keepwarm
+PLUGIN_ZIP='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'
+
+echo ""
+echo "=== keepwarm 설치/업데이트 (Mac) ==="
+
+if ! command -v claude >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/claude" ]; then
+  echo "Claude Code(claude 명령)를 찾지 못했습니다. Claude Code를 먼저 설치해 주세요."
+  exit 1
+fi
+
+CLAUDE_DIR="$HOME/.claude"
+MOD_DIR="$CLAUDE_DIR/mods/$NAME"
+IS_UPDATE=0
+[ -d "$MOD_DIR" ] && IS_UPDATE=1
+rm -rf "$MOD_DIR"
+mkdir -p "$MOD_DIR"
+TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/keepwarm.XXXXXX")"
+TMP_ZIP="$TMP_DIR/plugin.zip"
+printf '%s' "$PLUGIN_ZIP" | base64 -d > "$TMP_ZIP" 2>/dev/null || printf '%s' "$PLUGIN_ZIP" | base64 -D > "$TMP_ZIP"
+unzip -q -o "$TMP_ZIP" -d "$MOD_DIR"
+rm -f "$TMP_ZIP"
+rmdir "$TMP_DIR"
+echo "모드 설치: $MOD_DIR"
+
+# settings.json 의 env.CLAUDE_CODE_PLUGIN_DIRS 에 모드 경로 추가 (없을 때만, 백업 후)
+SETTINGS="$CLAUDE_DIR/settings.json"
+mkdir -p "$CLAUDE_DIR"
+BAK=""
+if [ -f "$SETTINGS" ]; then BAK="$SETTINGS.bak-$(date +%Y%m%d%H%M%S)-$$"; cp "$SETTINGS" "$BAK"; fi
+if command -v python3 >/dev/null 2>&1 && python3 -c 'import json' >/dev/null 2>&1; then
+  RESULT=$(python3 -I - "$SETTINGS" "$MOD_DIR" <<'PY'
+import json, os, sys
+path, mod = sys.argv[1], sys.argv[2]
+s = {}
+if os.path.exists(path) and open(path, encoding='utf-8').read().strip():
+    s = json.load(open(path, encoding='utf-8'))
+env = s.setdefault('env', {})
+dirs = [d for d in env.get('CLAUDE_CODE_PLUGIN_DIRS', '').split(':') if d]
+known = {mod, mod.rstrip('/'), '~/.claude/mods/keepwarm'}
+if any(d.rstrip('/') in known for d in dirs):
+    print('same')
+else:
+    env['CLAUDE_CODE_PLUGIN_DIRS'] = ':'.join(dirs + [mod])
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump(s, f, ensure_ascii=False, indent=2)
+        f.write('\n')
+    print('added')
+PY
+)
+else
+  RESULT=$(osascript -l JavaScript - "$SETTINGS" "$MOD_DIR" <<'JXA'
+ObjC.import('Foundation')
+function run(argv) {
+  const path = argv[0], mod = argv[1]
+  const fm = $.NSFileManager.defaultManager
+  let s = {}
+  if (fm.fileExistsAtPath(path)) {
+    const raw = ObjC.unwrap($.NSString.stringWithContentsOfFileEncodingError(path, $.NSUTF8StringEncoding, null))
+    if (raw && raw.trim()) s = JSON.parse(raw)
+  }
+  s.env = s.env || {}
+  const dirs = (s.env.CLAUDE_CODE_PLUGIN_DIRS || '').split(':').filter(Boolean)
+  const known = [mod, mod.replace(/\/$/, ''), '~/.claude/mods/keepwarm']
+  if (dirs.some(d => known.includes(d.replace(/\/$/, '')))) return 'same'
+  s.env.CLAUDE_CODE_PLUGIN_DIRS = dirs.concat([mod]).join(':')
+  $(JSON.stringify(s, null, 2) + '\n').writeToFileAtomicallyEncodingError(path, true, $.NSUTF8StringEncoding, null)
+  return 'added'
+}
+JXA
+)
+fi
+if [ "$RESULT" = "added" ]; then
+  echo "설정 반영: $SETTINGS"
+  [ -n "$BAK" ] && echo "  (기존 파일 백업: $BAK)"
+else
+  echo "설정: 이미 등록되어 있어 바꾸지 않았습니다."
+  [ -n "$BAK" ] && rm -f "$BAK"
+fi
+
+echo ""
+if [ "$IS_UPDATE" = 1 ]; then echo "업데이트가 끝났습니다."; else echo "설치가 끝났습니다."; fi
+echo "열려 있는 Claude Code를 모두 종료하고 다시 실행하세요. /keepwarm 으로 상태를 볼 수 있습니다."

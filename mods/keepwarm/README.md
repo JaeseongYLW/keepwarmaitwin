@@ -43,13 +43,24 @@ Claude Code 터미널 CLI용 모드입니다. 외부 도구 두 개(claude-keepw
 - 캐시 읽기(ping 1회) = 기본 단가 x 0.1
 - 구독 요금제에서는 금액이 청구되지 않고 사용 한도가 차감됩니다. 표시되는 금액은 비교용 추정치입니다.
 
-## 설치/업데이트 (Windows)
+## 설치/업데이트
+
+### Windows
 
 `keepwarm-install.cmd`를 더블클릭하면 끝납니다. 새 버전이 나오면 새 파일을 다시 실행하면 덮어써서 업데이트됩니다(설정값은 유지).
 
 - 모드 위치: `%USERPROFILE%\.claude\mods\keepwarm`
 - `~/.claude/settings.json`의 `env.CLAUDE_CODE_PLUGIN_DIRS`에 이 경로가 없으면 추가합니다.
 - 설치 파일 만들기: `python installer/build_installer.py keepwarm` → `dist/keepwarm-install.cmd`
+
+### Mac
+
+터미널을 열고 `bash `(뒤에 공백 한 칸)를 입력한 다음, `keepwarm-install-mac.command` 파일을 터미널 창으로 끌어다 놓고 Enter를 누릅니다.
+Finder에서 더블클릭해도 되지만, 처음에는 "확인되지 않은 개발자" 경고가 나올 수 있습니다. 그때는 파일을 Control-클릭한 뒤 "열기"를 누르세요.
+
+- 모드 위치: `~/.claude/mods/keepwarm`
+- `~/.claude/settings.json`의 `env.CLAUDE_CODE_PLUGIN_DIRS`(구분자 `:`)에 없으면 추가합니다(백업 후).
+- 설치 파일 만들기: `python installer/build_installer.py keepwarm --mac` → `dist/keepwarm-install-mac.command`
 
 ## 주의
 

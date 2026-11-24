@@ -2,7 +2,9 @@
 
 사용:
   python installer/build_installer.py keepwarm
-      -> dist/keepwarm-install.cmd (비밀 값 없음, 저장소에 올려도 됨)
+      -> dist/keepwarm-install.cmd (Windows, 비밀 값 없음, 저장소에 올려도 됨)
+  python installer/build_installer.py keepwarm --mac
+      -> dist/keepwarm-install-mac.command (macOS)
   python installer/build_installer.py codemode-ab --webhook "<웹훅 URL>"
       -> dist/codemode-ab-install.cmd (웹훅 URL 포함, 저장소에 올리지 말 것)
 같은 파일을 다시 실행하면 덮어써서 업데이트됩니다.
@@ -36,8 +38,13 @@ def main():
     ap.add_argument('mod', choices=['keepwarm', 'codemode-ab'])
     ap.add_argument('--webhook')
     ap.add_argument('--out')
+    ap.add_argument('--mac', action='store_true', help='macOS용 .command 생성')
     a = ap.parse_args()
-    text = open(os.path.join(ROOT, 'installer', f'install-{a.mod}.ps1'), encoding='utf-8').read()
+    tpl = f'install-{a.mod}-mac.sh' if a.mac else f'install-{a.mod}.ps1'
+    tpl_path = os.path.join(ROOT, 'installer', tpl)
+    if not os.path.exists(tpl_path):
+        raise SystemExit(f'{tpl} 템플릿이 없습니다')
+    text = open(tpl_path, encoding='utf-8').read()
     if '__WEBHOOK_URL__' in text:
         if not a.webhook:
             raise SystemExit('--webhook 이 필요합니다')
@@ -45,11 +52,15 @@ def main():
             raise SystemExit('웹훅 URL에 작은따옴표가 있으면 안 됩니다')
         text = text.replace('__WEBHOOK_URL__', a.webhook)
     text = text.replace('__PLUGIN_ZIP_BASE64__', plugin_zip(a.mod))
-    text = text.replace('\r\n', '\n').replace('\n', '\r\n')  # cmd 는 CRLF 필요
-    out = a.out or os.path.join(ROOT, 'dist', f'{a.mod}-install.cmd')
+    text = text.replace('\r\n', '\n')
+    if not a.mac:
+        text = text.replace('\n', '\r\n')  # cmd 는 CRLF 필요
+    out = a.out or os.path.join(ROOT, 'dist', f'{a.mod}-install-mac.command' if a.mac else f'{a.mod}-install.cmd')
     os.makedirs(os.path.dirname(out), exist_ok=True)
     with open(out, 'w', encoding='utf-8', newline='') as f:  # BOM 없이 (cmd 첫 줄 보호)
         f.write(text)
+    if a.mac:
+        os.chmod(out, 0o755)
     print(f'생성: {out}')
 
 
