@@ -43,15 +43,13 @@ Claude Code 터미널 CLI용 모드입니다. 외부 도구 두 개(claude-keepw
 - 캐시 읽기(ping 1회) = 기본 단가 x 0.1
 - 구독 요금제에서는 금액이 청구되지 않고 사용 한도가 차감됩니다. 표시되는 금액은 비교용 추정치입니다.
 
-## 설치 (로컬 터미널 CLI)
+## 설치/업데이트 (Windows)
 
-1. `keepwarm.plugin` 파일의 압축을 풀어 `~/.claude/mods/keepwarm/` 폴더에 둡니다(`.claude-plugin` 폴더가 그 바로 아래에 있어야 합니다).
-2. 한 번만 쓸 때: `claude --plugin-dir ~/.claude/mods/keepwarm`
-3. 항상 켜 두기: `~/.claude/settings.json`에 아래를 추가합니다.
+`keepwarm-install.cmd`를 더블클릭하면 끝납니다. 새 버전이 나오면 새 파일을 다시 실행하면 덮어써서 업데이트됩니다(설정값은 유지).
 
-```json
-{ "env": { "CLAUDE_CODE_PLUGIN_DIRS": "~/.claude/mods/keepwarm" } }
-```
+- 모드 위치: `%USERPROFILE%\.claude\mods\keepwarm`
+- `~/.claude/settings.json`의 `env.CLAUDE_CODE_PLUGIN_DIRS`에 이 경로가 없으면 추가합니다.
+- 설치 파일 만들기: `python installer/build_installer.py keepwarm` → `dist/keepwarm-install.cmd`
 
 ## 주의
 
