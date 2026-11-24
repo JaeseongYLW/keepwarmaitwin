@@ -8,6 +8,6 @@ export type CacheInfo = {
 
 declare module 'claude-code' {
   interface PluginState {
-    keepwarm: { cache: CacheInfo | null }
+    keepwarm: { cache: CacheInfo | null; footer: string }
   }
 }

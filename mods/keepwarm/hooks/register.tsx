@@ -4,10 +4,11 @@ import type { EngineInterface, Register } from 'claude-code'
 import type { CacheInfo } from '../types'
 
 const cacheAtom = atom({ plugin: 'keepwarm', key: 'cache' } as const, null as CacheInfo | null)
+const footerAtom = atom({ plugin: 'keepwarm', key: 'footer' } as const, '' as string)
 
 const MIN = 60_000
-const PING_TEXT =
-  '[keepwarm] 프롬프트 캐시 유지용 자동 ping입니다. 도구를 쓰지 말고 "ok" 한 단어만 답하세요.'
+const PING_TEXT = '[keepwarm] cache ping. Reply only: keepwarm-ok'
+const PING_REPLY = /^\s*`?keepwarm-ok`?[.!]?\s*$/i
 
 type Options = {
   cacheKeepalive?: boolean
@@ -80,10 +81,14 @@ export const register: Register = (on, options) => {
 
     const showStatus = async () => {
       const c = await read($, cacheAtom)
-      if (c === null) return $.ui.status(undefined)
+      if (c === null) {
+        await update($, footerAtom, () => '')
+        return
+      }
       const left = c.lastActivityAt + ttlMin * MIN - (await $.clock.now())
       const head = left > 0 ? `캐시 ${Math.ceil(left / MIN)}분 남음` : '캐시 만료됨'
-      $.ui.status(`🔥 ${head} · ${tok(c.contextTokens)} tok${enabled ? '' : ' · ping 꺼짐'}`)
+      const text = `${head} · ${tok(c.contextTokens)} tok · ${usd(reCacheCost(c.contextTokens))} (예측값)${enabled ? '' : ' · ping 꺼짐'}`
+      await update($, footerAtom, () => text)
     }
 
     const sendPing = async () => {
@@ -239,5 +244,27 @@ export const register: Register = (on, options) => {
       '명령: /keepwarm status | on | off | ping | window',
     )
     return { text: lines.join('\n') }
+  })
+
+  // 상태: 프롬프트 아래 오른쪽의 흐린 모드 표시줄에 붙인다 (플러그인 이름 없이)
+  on('ui.render', { component: 'SessionMode' }, async ($, e, next) => {
+    const text = await read($, footerAtom)
+    if (!text) return next(e)
+    return next({ ...e, props: { ...e.props, modes: [...e.props.modes, text] } })
+  })
+
+  // ping 대화 숨기기: 평소 화면에서는 감추고, ctrl+o 전체 보기에서는 그대로 보인다
+  on('ui.render', { component: 'UserMessage' }, async ($, e, next) => {
+    const o = e.props.origin
+    const isPing = o.kind === 'plugin' && o.name === 'keepwarm' && e.props.text.includes('[keepwarm]')
+    if (!isPing || e.props.isExpanded) return next(e)
+    const { Box } = $.ui.resolve(e)
+    return <Box />
+  })
+
+  on('ui.render', { component: 'AssistantMessage' }, async ($, e, next) => {
+    if (!PING_REPLY.test(e.props.text)) return next(e)
+    const { Box } = $.ui.resolve(e)
+    return <Box />
   })
 }

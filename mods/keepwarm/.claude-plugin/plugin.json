@@ -1,6 +1,6 @@
 {
   "name": "keepwarm",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "프롬프트 캐시 유지 ping, 캐시 만료 비용 경고, 5시간 사용 창 예약 시작을 하나로 묶은 모드",
   "license": "MIT",
   "types": "./types/index.d.ts",

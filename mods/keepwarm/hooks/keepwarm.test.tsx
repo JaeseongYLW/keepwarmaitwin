@@ -111,3 +111,60 @@ test('예약 시각에 사용 창 시작 요청을 하루 한 번 보낸다', { 
   await clock.advance(5 * MIN)
   expect(calls.length).toBe(1)
 })
+
+/** 테스트가 엔진 대신 그리는 행: 받은 props를 글자로 보여 준다 */
+function engineRows(on: On) {
+  for (const component of ['SessionMode', 'UserMessage', 'AssistantMessage'] as const) {
+    on('ui.render', { component }, ($, e) => {
+      const { Text } = $.ui.resolve(e)
+      const p = e.props as { modes?: readonly string[]; text?: string }
+      return <Text>{p.modes ? p.modes.join(' & ') : p.text}</Text>
+    })
+  }
+}
+
+test('상태는 모드 표시줄에 예상 비용과 함께 붙는다', async ($, on) => {
+  const clock = mock.clock(on, { now: 1_000_000 })
+  mock.store(on)
+  engine(on)
+  engineRows(on)
+  await $.session.start({ cwd: '/', surface: 'terminal', isInteractive: true })
+  await $.prompt.submit({ text: '작업해줘', wait: false, origin: { kind: 'composer' } })
+  await $.turn.complete({ reason: 'answer', turnId: 't1', answer: 'done', durationMs: 1000, isAborted: false, usage: { ...USAGE, cache_read_input_tokens: 326_000 } })
+  await clock.advance(MIN)
+
+  for (const surface of ['terminal', 'desktop'] as const) {
+    const ui = await $.ui.mount({ plugin: 'keepwarm', surface, component: 'SessionMode', props: { modes: ['focus'] } })
+    const t = await ui.find({ type: 'Text' })
+    expect(t?.text).toContain('focus & 캐시 59분 남음 · 326k tok · $3.26 (예측값)')
+    expect(t?.text).not.toContain('🔥')
+    await ui.unmount()
+  }
+})
+
+test('ping 질문과 답은 평소 화면에서 숨고 전체 보기에서는 보인다', async ($, on) => {
+  engine(on)
+  engineRows(on)
+  const ping = { text: '[keepwarm] cache ping. Reply only: keepwarm-ok', origin: { kind: 'plugin', name: 'keepwarm' } as never }
+  for (const surface of ['terminal', 'desktop'] as const) {
+    const hidden = await $.ui.mount({ plugin: 'keepwarm', surface, component: 'UserMessage', props: { ...ping, isExpanded: false } })
+    expect(await hidden.find({ type: 'Text' })).toBeUndefined()
+    await hidden.unmount()
+
+    const shown = await $.ui.mount({ plugin: 'keepwarm', surface, component: 'UserMessage', props: { ...ping, isExpanded: true } })
+    expect((await shown.find({ type: 'Text' }))?.text).toContain('[keepwarm]')
+    await shown.unmount()
+
+    const reply = await $.ui.mount({ plugin: 'keepwarm', surface, component: 'AssistantMessage', props: { text: 'keepwarm-ok', isFirstOfReply: true } })
+    expect(await reply.find({ type: 'Text' })).toBeUndefined()
+    await reply.unmount()
+
+    const normal = await $.ui.mount({ plugin: 'keepwarm', surface, component: 'AssistantMessage', props: { text: 'ok', isFirstOfReply: true } })
+    expect((await normal.find({ type: 'Text' }))?.text).toBe('ok')
+    await normal.unmount()
+
+    const human = await $.ui.mount({ plugin: 'keepwarm', surface, component: 'UserMessage', props: { text: '[keepwarm] 이거 뭐야?', origin: { kind: 'composer' }, isExpanded: false } })
+    expect((await human.find({ type: 'Text' }))?.text).toContain('이거 뭐야')
+    await human.unmount()
+  }
+})
